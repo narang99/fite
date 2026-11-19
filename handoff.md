@@ -72,6 +72,24 @@ Error codes: `DENIED_BY_POLICY`, `USER_REJECTED`, `CONFIRM_TIMEOUT`, `INVALID_AR
 
 **Untrusted data marking:** any tool output that contains on-screen or third-party text (`read_screen`, notifications) is returned under `data.untrusted_content`, so the host can wrap it for the agent as data, not instructions.
 
+## Voice utterance (added after v0)
+
+The first feature on top of the protocol: the user holds a button on the phone, speaks, and the host transcribes it.
+
+**Phone → host:** a JSON header, followed by one binary frame holding the audio.
+```json
+{"type":"utterance","v":0,"id":"u-123","format":"wav","sample_rate":16000}
+```
+- The binary frame is a complete WAV file, mono, 16-bit PCM.
+- Audio is binary so it is not inflated by base64 and the host can read it without decoding.
+
+**Host → phone:** the usual `result`, with the transcript in `data.text`.
+```json
+{"type":"result","v":0,"id":"u-123","ok":true,"data":{"text":"play arijit singh"}}
+```
+- A failed transcription uses `ok: false` with `EXEC_FAILED`.
+- A malformed header or an unsupported format uses `INVALID_ARGS`.
+
 ## Tools v0 (phone side)
 
 | Tool | Args | Implementation (via Shizuku shell) | Default tier |
