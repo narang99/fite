@@ -1,8 +1,5 @@
 package dev.fiteduck.phoneagent
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -21,9 +18,16 @@ sealed interface Status {
 }
 
 /** Press starts the microphone, release sends what was said to the host. */
-class PushToTalk(private val scope: CoroutineScope, private val host: HostClient) {
-    var status: Status by mutableStateOf(Status.Idle)
-        private set
+class PushToTalk(
+    private val scope: CoroutineScope,
+    private val host: HostClient,
+    private val onStatus: (Status) -> Unit,
+) {
+    private var status: Status = Status.Idle
+        set(value) {
+            field = value
+            onStatus(value)
+        }
 
     private val recorder = Recorder()
 
@@ -47,4 +51,12 @@ class PushToTalk(private val scope: CoroutineScope, private val host: HostClient
 private fun Transcript.toStatus(): Status = when (this) {
     is Transcript.Heard -> Status.Heard(text)
     is Transcript.Failed -> Status.Failed(reason)
+}
+
+fun Status.message(): String = when (this) {
+    Status.Idle -> ""
+    Status.Listening -> "Listening"
+    Status.Sending -> "Sending"
+    is Status.Heard -> text.ifBlank { "(heard nothing)" }
+    is Status.Failed -> reason
 }

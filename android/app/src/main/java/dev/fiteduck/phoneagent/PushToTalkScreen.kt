@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +22,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PushToTalkScreen(status: Status, onPress: () -> Unit, onRelease: () -> Unit) {
+fun PushToTalkScreen(
+    status: Status,
+    onPress: () -> Unit,
+    onRelease: () -> Unit,
+    onShowFloatingMic: () -> Unit,
+) {
     Column(
         Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically),
@@ -33,6 +39,7 @@ fun PushToTalkScreen(status: Status, onPress: () -> Unit, onRelease: () -> Unit)
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
         )
+        Button(onClick = onShowFloatingMic) { Text("Show floating mic") }
     }
 }
 
@@ -55,12 +62,4 @@ private fun TalkButton(listening: Boolean, onPress: () -> Unit, onRelease: () ->
     ) {
         Text("Hold to talk", color = Color.White, style = MaterialTheme.typography.titleMedium)
     }
-}
-
-private fun Status.message(): String = when (this) {
-    Status.Idle -> ""
-    Status.Listening -> "Listening"
-    Status.Sending -> "Sending"
-    is Status.Heard -> text.ifBlank { "(heard nothing)" }
-    is Status.Failed -> reason
 }
