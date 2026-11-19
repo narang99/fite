@@ -14,8 +14,13 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "0.1"
+        buildConfigField("String", "HOST_URL", "\"ws://127.0.0.1:8765\"")
+        buildConfigField("String", "HOST_TOKEN", "\"dev-token\"")
     }
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -27,4 +32,5 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.13.0")
+    implementation("com.squareup.okhttp3:okhttp:5.5.1")
 }
